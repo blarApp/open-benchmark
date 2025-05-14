@@ -1,55 +1,38 @@
 from __future__ import print_function
 from time import sleep
 from tqdm import tqdm, trange
-from random import random
-from multiprocessing import Pool, freeze_support
-from concurrent.futures import ThreadPoolExecutor
-from threading import RLock
-from functools import partial
-import sys
-
-NUM_SUBITERS = 9
-PY2 = sys.version_info[:1] <= (2,)
+from multiprocessing import Pool, freeze_support, RLock
 
 
-def progresser(n, auto_position=True, write_safe=False, blocking=True):
-    interval = random() * 0.002 / (NUM_SUBITERS - n + 2)
+L = list(range(9))
+
+
+def progresser(n):
+    interval = 0.001 / (len(L) - n + 2)
     total = 5000
     text = "#{}, est. {:<04.2}s".format(n, interval * total)
-    for _ in trange(total, desc=text,
-                    lock_args=None if blocking else (False,),
-                    position=None if auto_position else n):
+    # NB: ensure position>0 to prevent printing '\n' on completion.
+    # `tqdm` can't autmoate this since this thread
+    # may not know about other bars in other threads #477.
+    for _ in tqdm(range(total), desc=text, position=n + 1):
         sleep(interval)
-    # NB: may not clear instances with higher `position` upon completion
-    # since this worker may not know about other bars #796
-    if write_safe:
-        # we think we know about other bars (currently only py3 threading)
-        if n == 6:
-            tqdm.write("n == 6 completed")
 
 
 if __name__ == '__main__':
     freeze_support()  # for Windows support
-    L = list(range(NUM_SUBITERS))[::-1]
-
-    print("Manual nesting")
-    for i in trange(16, desc="1"):
-        for _ in trange(16, desc="2 @ %d" % i, leave=i % 2):
-            sleep(0.01)
-
-    print("Multi-processing")
-    p = Pool(initializer=tqdm.set_lock, initargs=(tqdm.get_lock(),))
+    p = Pool(len(L),
+             initializer=tqdm.set_lock,
+             initargs=(RLock(),))
     p.map(progresser, L)
+    print('\n' * len(L))
 
-    # unfortunately need ncols
-    # to print spaces over leftover multi-processing bars (#796)
-    with tqdm(leave=False) as t:
-        ncols = t.ncols or 80
-    print(("{msg:<{ncols}}").format(msg="Multi-threading", ncols=ncols))
+    # alternatively, on UNIX, just use the default internal lock
+    p = Pool(len(L))
+    p.map(progresser, L)
+    print('\n' * len(L))
 
-    # explicitly set just threading lock for nonblocking progress
-    tqdm.set_lock(RLock())
-    with ThreadPoolExecutor() as p:
-        progresser_thread = partial(
-            progresser, write_safe=not PY2, blocking=False)
-        p.map(progresser_thread, L)
+    # a manual test demonstrating automatic fix for #477 on one thread
+    for _ in trange(10, desc="1", position=1):
+        for _ in trange(10, desc="2", position=0):
+            sleep(0.01)
+    print('\n')

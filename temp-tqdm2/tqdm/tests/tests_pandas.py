@@ -103,11 +103,6 @@ def test_pandas_data_frame():
         res2 = df.applymap(task_func)
         assert res1.equals(res2)
 
-        # apply unhashable
-        res1 = []
-        df.progress_apply(res1.extend)
-        assert len(res1) == df.size
-
         # apply
         for axis in [0, 1, 'index', 'columns']:
             res3 = df.progress_apply(task_func, axis=axis)
@@ -135,7 +130,7 @@ def test_pandas_data_frame():
 def test_pandas_groupby_apply():
     """Test pandas.DataFrame.groupby(...).progress_apply"""
     try:
-        from numpy.random import randint, rand
+        from numpy.random import randint
         import pandas as pd
     except ImportError:
         raise SkipTest
@@ -148,11 +143,6 @@ def test_pandas_groupby_apply():
 
         dfs = pd.DataFrame(randint(0, 50, (500, 3)), columns=list('abc'))
         dfs.groupby(['a']).progress_apply(lambda x: None)
-
-        df2 = df = pd.DataFrame(dict(a=randint(1, 8, 10000), b=rand(10000)))
-        res1 = df2.groupby("a").apply(max)
-        res2 = df2.groupby("a").progress_apply(max)
-        assert res1.equals(res2)
 
         our_file.seek(0)
 

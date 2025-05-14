@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Advice: use repr(our_file.read()) to print the full output of tqdm
 # (else '\r' will replace the previous lines and you'll see only the latest.
 
@@ -9,15 +8,11 @@ import os
 from nose import with_setup
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_raises
-from nose.tools import eq_
 from contextlib import contextmanager
-from warnings import catch_warnings, simplefilter
 
 from tqdm import tqdm
 from tqdm import trange
 from tqdm import TqdmDeprecationWarning
-from tqdm.std import Bar
-from tqdm.contrib import DummyTqdmFile
 
 try:
     from StringIO import StringIO
@@ -73,26 +68,20 @@ def pos_line_diff(res_list, expected_list, raise_nonempty=True):
     Return differences between two bar output lists.
     To be used with `RE_pos`
     """
+    ln = len(res_list)
+    if ln < len(expected_list):
+        res = [(None, e) for e in expected_list[ln:]]
+    elif ln > len(expected_list):
+        res = [(r, None) for r in res_list[ln:]]
     res = [(r, e) for r, e in zip(res_list, expected_list)
            for pos in [len(e) - len(e.lstrip('\n'))]  # bar position
-           if r != e  # simple comparison
            if not r.startswith(e)  # start matches
-           or not (
-               # move up at end (maybe less due to closing bars)
-               any(r.endswith(end + i * '\x1b[A') for i in range(pos + 1)
-                   for end in [
-                       ']',  # bar
-                       '  '])  # cleared
-               or '100%' in r  # completed bar
-               or r == '\n')  # final bar
-           or r[(-1 - pos) * len('\x1b[A'):] == '\x1b[A']  # too many moves up
-    if raise_nonempty and (res or len(res_list) != len(expected_list)):
-        if len(res_list) < len(expected_list):
-            res.extend([(None, e) for e in expected_list[len(res_list):]])
-        elif len(res_list) > len(expected_list):
-            res.extend([(r, None) for r in res_list[len(expected_list):]])
+           or not (r.endswith('\x1b[A' * pos)  # move up at end
+                   or r == '\n')  # final bar
+           or r[(-1 - pos) * len('\x1b[A'):] == '\x1b[A']  # extra move up
+    if res and raise_nonempty:
         raise AssertionError(
-            "Got => Expected\n" + '\n'.join('%r => %r' % i for i in res))
+            "Got => Expected\n" + '\n'.join('"%r" => "%r"' % i for i in res))
     return res
 
 
@@ -274,59 +263,6 @@ def test_format_meter():
         "100kiB [00:13, 7.69kiB/s]"
     assert format_meter(100, 1000, 12, ncols=0, rate=7.33) == \
         " 10% 100/1000 [00:12<02:02,  7.33it/s]"
-    eq_(
-        # ncols is small, l_bar is too large
-        # l_bar gets chopped
-        # no bar
-        # no r_bar
-        format_meter(
-            0, 1000, 13, ncols=10,
-            bar_format="************{bar:10}$$$$$$$$$$"),
-        "**********"  # 10/12 stars since ncols is 10
-    )
-    eq_(
-        # n_cols allows for l_bar and some of bar
-        # l_bar displays
-        # bar gets chopped
-        # no r_bar
-        format_meter(
-            0, 1000, 13, ncols=20,
-            bar_format="************{bar:10}$$$$$$$$$$"),
-        "************        "  # all 12 stars and 8/10 bar parts
-    )
-    eq_(
-        # n_cols allows for l_bar, bar, and some of r_bar
-        # l_bar displays
-        # bar displays
-        # r_bar gets chopped
-        format_meter(
-            0, 1000, 13, ncols=30,
-            bar_format="************{bar:10}$$$$$$$$$$"),
-        "************          $$$$$$$$"
-        # all 12 stars and 10 bar parts, but only 8/10 dollar signs
-    )
-    eq_(
-        # trim left ANSI; escape is before trim zone
-        format_meter(
-            0, 1000, 13, ncols=10,
-            bar_format="*****\033[22m****\033[0m***{bar:10}$$$$$$$$$$"),
-        "*****\033[22m****\033[0m*\033[0m"
-        # we only know it has ANSI codes, so we append an END code anyway
-    )
-    eq_(
-        # trim left ANSI; escape is at trim zone
-        format_meter(
-            0, 1000, 13, ncols=10,
-            bar_format="*****\033[22m*****\033[0m**{bar:10}$$$$$$$$$$"),
-        "*****\033[22m*****\033[0m"
-    )
-    eq_(
-        # trim left ANSI; escape is after trim zone
-        format_meter(
-            0, 1000, 13, ncols=10,
-            bar_format="*****\033[22m******\033[0m*{bar:10}$$$$$$$$$$"),
-        "*****\033[22m*****\033[0m"
-    )
     # Check that bar_format correctly adapts {bar} size to the rest
     assert format_meter(20, 100, 12, ncols=13, rate=8.1,
                         bar_format=r'{l_bar}{bar}|{n_fmt}/{total_fmt}') == \
@@ -334,12 +270,6 @@ def test_format_meter():
     assert format_meter(20, 100, 12, ncols=14, rate=8.1,
                         bar_format=r'{l_bar}{bar}|{n_fmt}/{total_fmt}') == \
         " 20%|" + unich(0x258d) + " |20/100"
-    # Check wide characters
-    if sys.version_info >= (3,):
-        assert format_meter(0, 1000, 13, ncols=68, prefix='ｆｕｌｌｗｉｄｔｈ: ') == \
-            "ｆｕｌｌｗｉｄｔｈ:   0%|                  | 0/1000 [00:13<?, ?it/s]"
-        assert format_meter(0, 1000, 13, ncols=68, prefix='ニッポン [ﾆｯﾎﾟﾝ]: ') == \
-            "ニッポン [ﾆｯﾎﾟﾝ]:   0%|                    | 0/1000 [00:13<?, ?it/s]"
     # Check that bar_format can print only {bar} or just one side
     assert format_meter(20, 100, 12, ncols=2, rate=8.1,
                         bar_format=r'{bar}') == \
@@ -354,18 +284,14 @@ def test_format_meter():
 
 def test_ansi_escape_codes():
     """Test stripping of ANSI escape codes"""
-    ansi = dict(BOLD='\033[1m', RED='\033[91m', END='\033[0m')
-    desc_raw = '{BOLD}{RED}Colored{END} description'
+    format_meter = tqdm.format_meter
+    ansi = {'BOLD': '\033[1m',
+            'RED': '\033[91m',
+            'END': '\033[0m'}
+    desc = '{BOLD}{RED}Colored{END} description'.format(**ansi)
     ncols = 123
-
-    desc_stripped = desc_raw.format(BOLD='', RED='', END='')
-    meter = tqdm.format_meter(0, 100, 0, ncols=ncols, prefix=desc_stripped)
-    assert len(meter) == ncols
-
-    desc = desc_raw.format(**ansi)
-    meter = tqdm.format_meter(0, 100, 0, ncols=ncols, prefix=desc)
-    # `format_meter` inserts an extra END for safety
-    ansi_len = len(desc) - len(desc_stripped) + len(ansi['END'])
+    ansi_len = sum([len(code) for code in ansi.values()])
+    meter = format_meter(0, 100, 0, ncols=ncols, prefix=desc)
     assert len(meter) == ncols + ansi_len
 
 
@@ -395,15 +321,6 @@ def test_si_format():
                                      unit_scale=True)
     assert '1000.0Y ' in format_meter(1, 999999999999999999999999999, 1,
                                       unit_scale=True)
-
-
-def test_bar_formatspec():
-    """Test Bar.__format__ spec"""
-    assert "{0:5a}".format(Bar(0.3)) == "#5   "
-    assert "{0:2}".format(Bar(0.5, charset=" .oO0")) == "0 "
-    assert "{0:2a}".format(Bar(0.5, charset=" .oO0")) == "# "
-    assert "{0:-6a}".format(Bar(0.5, 10)) == '##  '
-    assert "{0:2b}".format(Bar(0.5, 10)) == '  '
 
 
 @with_setup(pretest, posttest)
@@ -959,7 +876,7 @@ def test_ascii():
     for ascii in [" .oO0", " #"]:
         with closing(StringIO()) as our_file:
             for _ in tqdm(_range(len(ascii) - 1), file=our_file, miniters=1,
-                          mininterval=0, ascii=ascii, ncols=27):
+                          mininterval=0, ascii=ascii, ncols=1):
                 pass
             res = our_file.getvalue().strip("\r").split("\r")
         for bar, line in zip(ascii, res):
@@ -1015,17 +932,13 @@ def test_close():
             progressbar.update(3)
             res = our_file.getvalue()
             assert '| 3/3 ' in res  # Should be blank
-            assert '\n' not in res
         # close() called
         assert len(tqdm._instances) == 0
 
-        exres = res.rsplit(', ', 1)[0]
-        res = our_file.getvalue()
-        assert res[-1] == '\n'
-        if not res.startswith(exres):
-            raise AssertionError(
-                "\n<<< Expected:\n{0}\n>>> Got:\n{1}\n===".format(
-                    exres + ', ...it/s]\n', our_file.getvalue()))
+        exres = res + '\n'
+        if exres != our_file.getvalue():
+            raise AssertionError("\nExpected:\n{0}\nGot:{1}\n".format(
+                exres, our_file.getvalue()))
 
     # Closing after the output stream has closed
     with closing(StringIO()) as our_file:
@@ -1263,28 +1176,21 @@ def test_position():
              '\n\n\rpos2 bar:   0%',
              '\n\n\rpos2 bar:  50%',
              '\n\n\rpos2 bar: 100%',
-             '\rpos2 bar: 100%',
-             '\n\n\rpos1 bar:  50%',
+             '\n\rpos1 bar:  50%',
              '\n\n\rpos2 bar:   0%',
              '\n\n\rpos2 bar:  50%',
              '\n\n\rpos2 bar: 100%',
-             '\rpos2 bar: 100%',
-             '\n\n\rpos1 bar: 100%',
-             '\rpos1 bar: 100%',
-             '\n\rpos0 bar:  50%',
+             '\n\rpos1 bar: 100%',
+             '\rpos0 bar:  50%',
              '\n\rpos1 bar:   0%',
              '\n\n\rpos2 bar:   0%',
              '\n\n\rpos2 bar:  50%',
              '\n\n\rpos2 bar: 100%',
-             '\rpos2 bar: 100%',
-             '\n\n\rpos1 bar:  50%',
+             '\n\rpos1 bar:  50%',
              '\n\n\rpos2 bar:   0%',
              '\n\n\rpos2 bar:  50%',
              '\n\n\rpos2 bar: 100%',
-             '\rpos2 bar: 100%',
-             '\n\n\rpos1 bar: 100%',
-             '\rpos1 bar: 100%',
-             '\n\rpos0 bar: 100%',
+             '\n\rpos1 bar: 100%',
              '\rpos0 bar: 100%',
              '\n']
     pos_line_diff(res, exres)
@@ -1316,7 +1222,7 @@ def test_position():
     t2.close()
     t3.close()
 
-    # Test auto repositioning of bars when a bar is prematurely closed
+    # Test auto repositionning of bars when a bar is prematurely closed
     # tqdm._instances.clear()  # reset number of instances
     with closing(StringIO()) as our_file:
         t1 = tqdm(total=10, file=our_file, desc='pos0 bar', mininterval=0)
@@ -1337,10 +1243,7 @@ def test_position():
         exres = ['\rpos0 bar:   0%',
                  '\n\rpos1 bar:   0%',
                  '\n\n\rpos2 bar:   0%',
-                 '\n\n\r      ',
-                 '\r\x1b[A\x1b[A',
-                 '\rpos1 bar:   0%',
-                 '\n\n\n\rpos3 bar:   0%',
+                 '\n\n\rpos3 bar:   0%',
                  '\rpos0 bar:  10%',
                  '\n\rpos2 bar:  10%',
                  '\n\n\rpos3 bar:  10%']
@@ -1374,11 +1277,6 @@ def test_set_description():
             assert t.desc == ''
         assert "World" not in our_file.getvalue()
 
-    # unicode
-    with closing(StringIO()) as our_file:
-        with tqdm(total=10, file=our_file) as t:
-            t.set_description(u"\xe1\xe9\xed\xf3\xfa")
-
 
 @with_setup(pretest, posttest)
 def test_deprecated_gui():
@@ -1390,8 +1288,7 @@ def test_deprecated_gui():
         try:
             t.update(1)
         except TqdmDeprecationWarning as e:
-            if ('Please use `tqdm.gui.tqdm(...)` instead of'
-                ' `tqdm(..., gui=True)`') \
+            if 'Please use `tqdm_gui(...)` instead of `tqdm(..., gui=True)`' \
                     not in our_file.getvalue():
                 raise e
         else:
@@ -1407,8 +1304,7 @@ def test_deprecated_gui():
             for _ in t:
                 pass
         except TqdmDeprecationWarning as e:
-            if ('Please use `tqdm.gui.tqdm(...)` instead of'
-                ' `tqdm(..., gui=True)`') \
+            if 'Please use `tqdm_gui(...)` instead of `tqdm(..., gui=True)`' \
                     not in our_file.getvalue():
                 raise e
         else:
@@ -1593,10 +1489,10 @@ def test_write():
             assert before_err == '\rpos0 bar:   0%|\rpos0 bar:  10%|'
             assert before_out == ''
             after_err_res = [m[0] for m in RE_pos.findall(after_err)]
-            exres = ['\rpos0 bar:   0%|',
-                     '\rpos0 bar:  10%|',
-                     '\r               ',
-                     '\r\rpos0 bar:  10%|']
+            exres = [u'\rpos0 bar:   0%',
+                     u'\rpos0 bar:  10%',
+                     u'\r      ',
+                     u'\r\rpos0 bar:  10%']
             pos_line_diff(after_err_res, exres)
             assert after_out == s + '\n'
     # Restore stdout and stderr
@@ -1732,6 +1628,19 @@ def test_postfix_direct():
         assert "j  8.00" in res
 
 
+class DummyTqdmFile(object):
+    """Dummy file-like that will write to tqdm"""
+    file = None
+
+    def __init__(self, file):
+        self.file = file
+
+    def write(self, x):
+        # Avoid print() second call (useless \n)
+        if len(x.rstrip()) > 0:
+            tqdm.write(x, file=self.file, nolock=True)
+
+
 @contextmanager
 def std_out_err_redirect_tqdm(tqdm_file=sys.stderr):
     orig_out_err = sys.stdout, sys.stderr
@@ -1779,11 +1688,10 @@ def test_external_write():
 def test_unit_scale():
     """Test numeric `unit_scale`"""
     with closing(StringIO()) as our_file:
-        for _ in tqdm(_range(9), unit_scale=9, file=our_file,
-                      miniters=1, mininterval=0):
+        for _ in tqdm(_range(100), unit_scale=9, file=our_file):
             pass
         out = our_file.getvalue()
-        assert '81/81' in out
+        assert '900/900' in out
 
 
 @with_setup(pretest, posttest)
@@ -1802,31 +1710,32 @@ def test_threading():
 @with_setup(pretest, posttest)
 def test_bool():
     """Test boolean cast"""
+
     def internal(our_file, disable):
-        kwargs = dict(file=our_file, disable=disable)
-        with trange(10, **kwargs) as t:
+        with trange(10, file=our_file, disable=disable) as t:
             assert t
-        with trange(0, **kwargs) as t:
+        with trange(0, file=our_file, disable=disable) as t:
             assert not t
-        with tqdm(total=10, **kwargs) as t:
-            assert bool(t)
-        with tqdm(total=0, **kwargs) as t:
-            assert not bool(t)
-        with tqdm([], **kwargs) as t:
-            assert not t
-        with tqdm([0], **kwargs) as t:
-            assert t
-        with tqdm((x for x in []), **kwargs) as t:
-            assert t
-        with tqdm((x for x in [1, 2, 3]), **kwargs) as t:
-            assert t
-        with tqdm(**kwargs) as t:
-            try:
-                print(bool(t))
-            except TypeError:
-                pass
-            else:
-                raise TypeError("Expected bool(tqdm()) to fail")
+
+        def get_bool_for_tqdm(*args, **kwargs):
+            kwargs['file'] = our_file
+            kwargs['disable'] = disable
+            with tqdm(*args, **kwargs) as t:
+                return bool(t)
+
+        assert get_bool_for_tqdm(total=10)
+        assert not get_bool_for_tqdm(total=0)
+        assert not get_bool_for_tqdm([])
+        assert get_bool_for_tqdm([0])
+        assert get_bool_for_tqdm((x for x in []))
+        assert get_bool_for_tqdm((x for x in [1,2,3]))
+        try:
+            get_bool_for_tqdm()
+        except TypeError:
+            pass
+        else:
+            raise TypeError(
+                "Expected tqdm() with neither total nor iterable to fail")
 
     # test with and without disable
     with closing(StringIO()) as our_file:
@@ -1852,41 +1761,3 @@ def test_auto():
     from tqdm import autonotebook, auto
     backendCheck(autonotebook)
     backendCheck(auto)
-
-
-@with_setup(pretest, posttest)
-def test_wrapattr():
-    """Test wrapping file-like objects"""
-    data = "a twenty-char string"
-
-    with closing(StringIO()) as our_file:
-        with closing(StringIO()) as writer:
-            with tqdm.wrapattr(
-                    writer, "write", file=our_file, bytes=True) as wrap:
-                wrap.write(data)
-            res = writer.getvalue()
-            assert data == res
-        res = our_file.getvalue()
-        assert ('%.1fB [' % len(data)) in res
-
-    with closing(StringIO()) as our_file:
-        with closing(StringIO()) as writer:
-            with tqdm.wrapattr(
-                    writer, "write", file=our_file, bytes=False) as wrap:
-                wrap.write(data)
-        res = our_file.getvalue()
-        assert ('%dit [' % len(data)) in res
-
-
-@with_setup(pretest, posttest)
-def test_float_progress():
-    """Test float totals"""
-    with closing(StringIO()) as our_file:
-        with trange(10, total=9.6, file=our_file) as t:
-            with catch_warnings(record=True) as w:
-                simplefilter("always")
-                for i in t:
-                    if i < 9:
-                        assert not w
-                assert w
-                assert "clamping frac" in str(w[-1].message)

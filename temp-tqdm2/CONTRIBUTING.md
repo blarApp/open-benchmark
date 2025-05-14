@@ -34,39 +34,7 @@ typical steps would be:
 You can then add a message to describe your proposal.)
 
 
-## WHAT CODE LAYOUT SHOULD I FOLLOW?
-
-Don't worry too much - maintainers can help reorganise contributions.
-However it would be helpful to bear in mind:
-
-- The standard core of `tqdm`, i.e. [`tqdm.std.tqdm`](tqdm/std.py)
-    + must have no dependencies apart from pure python built-in standard libraries
-    + must have negligible impact on performance
-    + should have 100% coverage by unit tests
-    + should be appropriately commented
-    + should have well-formatted docstrings for functions
-        * under 76 chars (incl. initial spaces) to avoid linebreaks in terminal pagers
-        * use two spaces between variable name and colon
-        * use [default: ...] for default values of keyword arguments
-    + will not break backward compatibility unless there is a very good reason
-        * e.g. breaking py26 compatibility purely in favour of readability (such as converting `dict(a=1)` to `{'a': 1}`) is not a good enough reason
-    + API changes should be discussed carefully
-    + remember, with millions of downloads per month, `tqdm` must be extremely fast and reliable
-- Any other kind of change may be included in a (possibly new) submodule
-    + submodules are likely single python files under the main [tqdm/](tqdm/) directory
-        * large submodules requiring a sub-folder should be included in [`MANIFEST.in`](MANIFEST.in)
-    + submodules extending `tqdm.std.tqdm` or any other module (e.g. [`tqdm.notebook.tqdm`](tqdm/notebook.py), [`tqdm.gui.tqdm`](tqdm/gui.py))
-    + can implement anything from experimental new features to support for third-party libraries such as `pandas`, `numpy`, etc.
-    + submodule maturity
-        * alpha: experimental; missing unit tests, comments, and/or feedback; raises `tqdm.TqdmExperimentalWarning`
-        * beta: well-used; commented, perhaps still missing tests
-        * stable: >10 users; commented, 80% coverage
-
-
 ## TESTING
-
-Once again, don't worry too much - tests are automated online, and maintainers
-can also help.
 
 To test functionality (such as before submitting a Pull
 Request), there are a number of unit tests.
@@ -329,8 +297,8 @@ For experienced devs, once happy with local master:
 5. wait for tests to pass
     a) in case of failure, fix and go back to (2)
 6. `git tag vM.m.p && git push --tags`
-7. **`[AUTO:TravisCI]`** `[python setup.py] make distclean`
-8. **`[AUTO:TravisCI]`** `[python setup.py] make build`
+7. `[python setup.py] make distclean`
+8. `[python setup.py] make build`
 9. **`[AUTO:TravisCI]`** upload to PyPI. either:
     a) `[python setup.py] make pypi`, or
     b) `twine upload -s -i $(git config user.signingkey) dist/tqdm-*`
@@ -338,10 +306,10 @@ For experienced devs, once happy with local master:
     a) `make -B docker`
     b) `docker push tqdm/tqdm:latest`
     c) `docker push tqdm/tqdm:$(docker run -i --rm tqdm/tqdm -v)`
-11. **`[AUTO:TravisCI]`** upload to snapcraft:
+11. upload to snapcraft:
     a) `make snap`, and
     b) `snapcraft push tqdm*.snap --release stable`
-12. Wait for travis to draft a new release on <https://github.com/tqdm/tqdm/releases>
+12. create new release on <https://github.com/tqdm/tqdm/releases>
     a) add helpful release notes
     b) **`[AUTO:TravisCI]`** attach `dist/tqdm-*` binaries
        (usually only `*.whl*`)

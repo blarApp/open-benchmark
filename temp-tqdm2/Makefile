@@ -43,11 +43,11 @@ all:
 	@+make build
 
 flake8:
-	@+flake8 -j 8 --count --statistics --exit-zero .
+	@+flake8 --max-line-length=80 --exclude .asv,.tox,.ipynb_checkpoints,build \
+    --ignore=W503,W504 -j 8 --count --statistics --exit-zero .
 
 test:
-	TOX_SKIP_ENV=perf tox --skip-missing-interpreters -p all
-	tox -e perf
+	tox --skip-missing-interpreters
 
 testnose:
 	nosetests tqdm -d -v
@@ -55,7 +55,7 @@ testnose:
 testsetup:
 	@make README.rst
 	@make tqdm/tqdm.1
-	python setup.py check --metadata --restructuredtext --strict
+	python setup.py check --restructuredtext --strict
 	python setup.py make none
 
 testcoverage:
@@ -118,12 +118,10 @@ prebuildclean:
 coverclean:
 	@+python -c "import os; os.remove('.coverage') if os.path.exists('.coverage') else None"
 	@+python -c "import shutil; shutil.rmtree('tqdm/__pycache__', True)"
-	@+python -c "import shutil; shutil.rmtree('tqdm/contrib/__pycache__', True)"
 	@+python -c "import shutil; shutil.rmtree('tqdm/tests/__pycache__', True)"
 clean:
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('*.py[co]')]"
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('tqdm/*.py[co]')]"
-	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('tqdm/contrib/*.py[co]')]"
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('tqdm/tests/*.py[co]')]"
 	@+python -c "import os, glob; [os.remove(i) for i in glob.glob('tqdm/examples/*.py[co]')]"
 toxclean:
@@ -156,7 +154,7 @@ buildupload:
 	@make pypi
 
 snap:
-	@make -B snapcraft.yaml
+	@make snapcraft.yaml
 	snapcraft
 docker:
 	@make .dockerignore

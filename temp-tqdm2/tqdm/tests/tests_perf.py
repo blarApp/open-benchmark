@@ -159,18 +159,6 @@ def simple_progress(iterable=None, total=None, file=sys.stdout, desc='',
         return update_and_print
 
 
-def assert_performance(thresh, name_left, time_left, name_right, time_right):
-    """raises if time_left > thresh * time_right"""
-    if time_left > thresh * time_right:
-        raise ValueError(
-            ('{name[0]}: {time[0]:f}, '
-             '{name[1]}: {time[1]:f}, '
-             'ratio {ratio:f} > {thresh:f}').format(
-                name=(name_left, name_right),
-                time=(time_left, time_right),
-                ratio=time_left / time_right, thresh=thresh))
-
-
 @with_setup(pretest, posttest)
 @retry_on_except()
 def test_iter_overhead():
@@ -192,7 +180,10 @@ def test_iter_overhead():
                 a += i
                 our_file.write(a)
 
-    assert_performance(6, 'trange', time_tqdm(), 'range', time_bench())
+    # Compute relative overhead of tqdm against native range()
+    if time_tqdm() > 9 * time_bench():
+        raise AssertionError('trange(%g): %f, range(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))
 
 
 @with_setup(pretest, posttest)
@@ -216,49 +207,10 @@ def test_manual_overhead():
                 a += i
                 our_file.write(a)
 
-    assert_performance(6, 'tqdm', time_tqdm(), 'range', time_bench())
-
-
-def worker(total, blocking=True):
-    def incr_bar(x):
-        with closing(StringIO()) as our_file:
-            for _ in trange(
-                    total, file=our_file,
-                    lock_args=None if blocking else (False,),
-                    miniters=1, mininterval=0, maxinterval=0):
-                pass
-        return x + 1
-    return incr_bar
-
-
-@with_setup(pretest, posttest)
-@retry_on_except()
-def test_lock_args():
-    """Test overhead of nonblocking threads"""
-    try:
-        from concurrent.futures import ThreadPoolExecutor
-        from threading import RLock
-    except ImportError:
-        raise SkipTest
-    import sys
-
-    total = 8
-    subtotal = 1000
-
-    tqdm.set_lock(RLock())
-    with ThreadPoolExecutor(total) as pool:
-        sys.stderr.write('block ... ')
-        sys.stderr.flush()
-        with relative_timer() as time_tqdm:
-            res = list(pool.map(worker(subtotal, True), range(total)))
-            assert sum(res) == sum(range(total)) + total
-        sys.stderr.write('noblock ... ')
-        sys.stderr.flush()
-        with relative_timer() as time_noblock:
-            res = list(pool.map(worker(subtotal, False), range(total)))
-            assert sum(res) == sum(range(total)) + total
-
-    assert_performance(0.2, 'noblock', time_noblock(), 'tqdm', time_tqdm())
+    # Compute relative overhead of tqdm against native range()
+    if time_tqdm() > 10 * time_bench():
+        raise AssertionError('tqdm(%g): %f, range(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))
 
 
 @with_setup(pretest, posttest)
@@ -283,7 +235,12 @@ def test_iter_overhead_hard():
                 a += i
                 our_file.write(("%i" % a) * 40)
 
-    assert_performance(85, 'trange', time_tqdm(), 'range', time_bench())
+    # Compute relative overhead of tqdm against native range()
+    try:
+        assert time_tqdm() < 60 * time_bench()
+    except AssertionError:
+        raise AssertionError('trange(%g): %f, range(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))
 
 
 @with_setup(pretest, posttest)
@@ -308,7 +265,12 @@ def test_manual_overhead_hard():
                 a += i
                 our_file.write(("%i" % a) * 40)
 
-    assert_performance(85, 'tqdm', time_tqdm(), 'range', time_bench())
+    # Compute relative overhead of tqdm against native range()
+    try:
+        assert time_tqdm() < 100 * time_bench()
+    except AssertionError:
+        raise AssertionError('tqdm(%g): %f, range(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))
 
 
 @with_setup(pretest, posttest)
@@ -334,8 +296,12 @@ def test_iter_overhead_simplebar_hard():
             for i in s:
                 a += i
 
-    assert_performance(
-        5, 'trange', time_tqdm(), 'simple_progress', time_bench())
+    # Compute relative overhead of tqdm against native range()
+    try:
+        assert time_tqdm() < 3 * time_bench()
+    except AssertionError:
+        raise AssertionError('trange(%g): %f, simple_progress(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))
 
 
 @with_setup(pretest, posttest)
@@ -355,13 +321,16 @@ def test_manual_overhead_simplebar_hard():
                 t.update(10)
 
         simplebar_update = simple_progress(
-            total=total * 10, file=our_file, leave=True, miniters=1,
-            mininterval=0)
+            total=total, file=our_file, leave=True, miniters=1, mininterval=0)
         a = 0
         with relative_timer() as time_bench:
             for i in _range(total):
                 a += i
                 simplebar_update(10)
 
-    assert_performance(
-        5, 'tqdm', time_tqdm(), 'simple_progress', time_bench())
+    # Compute relative overhead of tqdm against native range()
+    try:
+        assert time_tqdm() < 3 * time_bench()
+    except AssertionError:
+        raise AssertionError('tqdm(%g): %f, simple_progress(%g): %f' %
+                             (total, time_tqdm(), total, time_bench()))

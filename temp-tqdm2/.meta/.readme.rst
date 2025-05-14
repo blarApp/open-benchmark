@@ -3,11 +3,12 @@
 tqdm
 ====
 
-|Py-Versions| |Versions| |Conda-Forge-Status| |Docker| |Snapcraft|
+|PyPI-Versions| |PyPI-Status| |Conda-Forge-Status| |Docker| |Snapcraft|
 
 |Build-Status| |Coverage-Status| |Branch-Coverage-Status| |Codacy-Grade| |Libraries-Rank| |PyPI-Downloads|
 
-|DOI| |LICENCE| |OpenHub-Status| |binder-demo| |notebook-demo| |awesome-python|
+|DOI-URI| |LICENCE| |OpenHub-Status| |binder-demo| |notebook-demo|
+
 
 ``tqdm`` means "progress" in Arabic (*taqadum*, تقدّم)
 and is an abbreviation for "I love you so much" in Spanish (*te quiero demasiado*).
@@ -27,7 +28,7 @@ iterable with ``tqdm(iterable)``, and you're done!
 ``tqdm(xrange(N))``.
 
 |Screenshot|
-    |Video| |Slides|
+    REPL: `ptpython <https://github.com/jonathanslenders/ptpython>`__
 
 It can also be executed as a module with pipes:
 
@@ -40,7 +41,7 @@ It can also be executed as a module with pipes:
         tqdm --total $(find docs/ -type f | wc -l) --unit files >> backup.log
     100%|███████████████████████████████▉| 8014/8014 [01:37<00:00, 82.29files/s]
 
-Overhead is low -- about 60ns per iteration (80ns with ``tqdm.gui``), and is
+Overhead is low -- about 60ns per iteration (80ns with ``tqdm_gui``), and is
 unit tested against performance regression.
 By comparison, the well-established
 `ProgressBar <https://github.com/niltonvolpato/python-progressbar>`__ has
@@ -71,7 +72,7 @@ Installation
 Latest PyPI stable release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-|Versions| |PyPI-Downloads| |Libraries-Dependents|
+|PyPI-Status| |PyPI-Downloads| |Libraries-Dependents|
 
 .. code:: sh
 
@@ -102,13 +103,9 @@ Latest Snapcraft release
 
 |Snapcraft|
 
-There are 3 channels to choose from:
-
 .. code:: sh
 
-    snap install tqdm  # implies --stable, i.e. latest tagged release
-    snap install tqdm  --candidate  # master branch
-    snap install tqdm  --edge  # devel branch
+    snap install tqdm
 
 Latest Docker release
 ~~~~~~~~~~~~~~~~~~~~~
@@ -119,16 +116,6 @@ Latest Docker release
 
     docker pull tqdm/tqdm
     docker run -i --rm tqdm/tqdm --help
-
-Other
-~~~~~
-
-There are other (unofficial) places where ``tqdm`` may be downloaded, particularly for CLI use:
-
-|Repology|
-
-.. |Repology| image:: https://repology.org/badge/tiny-repos/python:tqdm.svg
-   :target: https://repology.org/project/python:tqdm/versions
 
 Changelog
 ---------
@@ -257,29 +244,25 @@ of a neat one-line progress bar.
 
 - Consoles in general: require support for carriage return (``CR``, ``\r``).
 - Nested progress bars:
-
-  * Consoles in general: require support for moving cursors up to the
-    previous line. For example,
-    `IDLE <https://github.com/tqdm/tqdm/issues/191#issuecomment-230168030>`__,
-    `ConEmu <https://github.com/tqdm/tqdm/issues/254>`__ and
-    `PyCharm <https://github.com/tqdm/tqdm/issues/203>`__ (also
-    `here <https://github.com/tqdm/tqdm/issues/208>`__,
-    `here <https://github.com/tqdm/tqdm/issues/307>`__, and
-    `here <https://github.com/tqdm/tqdm/issues/454#issuecomment-335416815>`__)
-    lack full support.
-  * Windows: additionally may require the Python module ``colorama``
-    to ensure nested bars stay within their respective lines.
-
+    * Consoles in general: require support for moving cursors up to the
+      previous line. For example,
+      `IDLE <https://github.com/tqdm/tqdm/issues/191#issuecomment-230168030>`__,
+      `ConEmu <https://github.com/tqdm/tqdm/issues/254>`__ and
+      `PyCharm <https://github.com/tqdm/tqdm/issues/203>`__ (also
+      `here <https://github.com/tqdm/tqdm/issues/208>`__,
+      `here <https://github.com/tqdm/tqdm/issues/307>`__, and
+      `here <https://github.com/tqdm/tqdm/issues/454#issuecomment-335416815>`__)
+      lack full support.
+    * Windows: additionally may require the Python module ``colorama``
+      to ensure nested bars stay within their respective lines.
 - Unicode:
-
-  * Environments which report that they support unicode will have solid smooth
-    progressbars. The fallback is an ```ascii``-only bar.
-  * Windows consoles often only partially support unicode and thus
-    `often require explicit ascii=True <https://github.com/tqdm/tqdm/issues/454#issuecomment-335416815>`__
-    (also `here <https://github.com/tqdm/tqdm/issues/499>`__). This is due to
-    either normal-width unicode characters being incorrectly displayed as
-    "wide", or some unicode characters not rendering.
-
+    * Environments which report that they support unicode will have solid smooth
+      progressbars. The fallback is an ```ascii``-only bar.
+    * Windows consoles often only partially support unicode and thus
+      `often require explicit ascii=True <https://github.com/tqdm/tqdm/issues/454#issuecomment-335416815>`__
+      (also `here <https://github.com/tqdm/tqdm/issues/499>`__). This is due to
+      either normal-width unicode characters being incorrectly displayed as
+      "wide", or some unicode characters not rendering.
 - Wrapping enumerated iterables: use ``enumerate(tqdm(...))`` instead of
   ``tqdm(enumerate(...))``. The same applies to ``numpy.ndenumerate``.
   This is because enumerate functions tend to hide the length of iterables.
@@ -288,7 +271,7 @@ of a neat one-line progress bar.
   ``tqdm(zip(a, b))`` should be replaced with ``zip(tqdm(a), b)`` or even
   ``zip(tqdm(a), tqdm(b))``.
 - `Hanging pipes in python2 <https://github.com/tqdm/tqdm/issues/359>`__:
-  when using ``tqdm`` on the CLI, you may need to use Python 3.5+ for correct
+  when using ``tqdm`` on the CLI, you may need to use python 3.5+ for correct
   buffering.
 
 If you come across any other difficulties, browse and file |GitHub-Issues|.
@@ -296,11 +279,11 @@ If you come across any other difficulties, browse and file |GitHub-Issues|.
 Documentation
 -------------
 
-|Py-Versions| |README-Hits| (Since 19 May 2016)
+|PyPI-Versions| |README-Hits| (Since 19 May 2016)
 
 .. code:: python
 
-    class tqdm():
+    class tqdm(object):
       """{DOC_tqdm}"""
 
       def __init__(self, iterable=None, desc=None, total=None, leave=True,
@@ -317,14 +300,13 @@ Parameters
 Extra CLI Options
 ~~~~~~~~~~~~~~~~~
 
-{DOC_tqdm.cli.CLI_EXTRA_DOC}
+{DOC_tqdm._main.CLI_EXTRA_DOC}
 Returns
 ~~~~~~~
 
 {DOC_tqdm.tqdm.__init__.Returns}
 .. code:: python
 
-    class tqdm():
       def update(self, n=1):
           """{DOC_tqdm.tqdm.update}"""
 
@@ -366,20 +348,18 @@ Returns
         On Python3+ range is used instead of xrange.
         """
 
-    class tqdm.gui.tqdm(tqdm.tqdm):
+    class tqdm_gui(tqdm):
         """Experimental GUI version"""
 
-    def tqdm.gui.trange(*args, **kwargs):
+    def tgrange(*args, **kwargs):
         """Experimental GUI version of trange"""
 
-    class tqdm.notebook.tqdm(tqdm.tqdm):
+    class tqdm_notebook(tqdm):
         """Experimental IPython/Jupyter Notebook widget"""
 
-    def tqdm.notebook.trange(*args, **kwargs):
+    def tnrange(*args, **kwargs):
         """Experimental IPython/Jupyter Notebook widget version of trange"""
 
-    class tqdm.keras.TqdmCallback(keras.callbacks.Callback):
-        """`keras` callback for epoch and batch progress"""
 
 Examples and Advanced Usage
 ---------------------------
@@ -388,11 +368,9 @@ Examples and Advanced Usage
   folder;
 - import the module and run ``help()``;
 - consult the `wiki <https://github.com/tqdm/tqdm/wiki>`__;
-
-  * this has an
-    `excellent article <https://github.com/tqdm/tqdm/wiki/How-to-make-a-great-Progress-Bar>`__
-    on how to make a **great** progressbar;
-
+    - this has an
+      `excellent article <https://github.com/tqdm/tqdm/wiki/How-to-make-a-great-Progress-Bar>`__
+      on how to make a **great** progressbar;
 - run the |notebook-demo| or |binder-demo|, or
 - check out the `slides from PyData London <https://tqdm.github.io/PyData2019/slides.html>`__.
 
@@ -404,7 +382,7 @@ with the ``desc`` and ``postfix`` arguments:
 
 .. code:: python
 
-    from tqdm import tqdm, trange
+    from tqdm import trange
     from random import random, randint
     from time import sleep
 
@@ -457,23 +435,6 @@ Additional ``bar_format`` parameters may also be defined by overriding
 
     00:01 in total: 40%|000o     | 4/10 [00:00<00:00,  9.96it/s]
 
-Note that ``{bar}`` also supports a format specifier ``[width][type]``.
-
-- ``width``
-
-  * unspecified (default): automatic to fill ``ncols``
-  * ``int >= 0``: fixed width overriding ``ncols`` logic
-  * ``int < 0``: subtract from the automatic default
-
-- ``type``
-
-  * ``a``: ascii (``ascii=True`` override)
-  * ``u``: unicode (``ascii=False`` override)
-  * ``b``: blank (``ascii="  "`` override)
-
-This means a fixed bar with right-justified text may be created by using:
-``bar_format="{l_bar}{bar:10}|{bar:-10b}right-justified"``
-
 Nested progress bars
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -492,16 +453,15 @@ Nested progress bars
 On Windows `colorama <https://github.com/tartley/colorama>`__ will be used if
 available to keep nested bars on their respective lines.
 
-For manual control over positioning (e.g. for multi-processing use),
+For manual control over positioning (e.g. for multi-threaded use),
 you may specify ``position=n`` where ``n=0`` for the outermost bar,
-``n=1`` for the next, and so on. However, it's best to check if `tqdm` can work
-without manual `position` first.
+``n=1`` for the next, and so on:
 
 .. code:: python
 
     from time import sleep
     from tqdm import trange, tqdm
-    from multiprocessing import Pool, freeze_support
+    from multiprocessing import Pool, freeze_support, RLock
 
     L = list(range(9))
 
@@ -509,37 +469,16 @@ without manual `position` first.
         interval = 0.001 / (n + 2)
         total = 5000
         text = "#{}, est. {:<04.2}s".format(n, interval * total)
-        for _ in trange(total, desc=text, position=n):
+        for i in trange(total, desc=text, position=n):
             sleep(interval)
 
     if __name__ == '__main__':
         freeze_support()  # for Windows support
-        p = Pool(initializer=tqdm.set_lock, initargs=(tqdm.get_lock(),))
+        p = Pool(len(L),
+                 # again, for Windows support
+                 initializer=tqdm.set_lock, initargs=(RLock(),))
         p.map(progresser, L)
-
-Note that in Python 3, ``tqdm.write`` is thread-safe:
-
-.. code:: python
-
-    from time import sleep
-    from tqdm import tqdm, trange
-    from concurrent.futures import ThreadPoolExecutor
-
-    L = list(range(9))
-
-    def progresser(n):
-        interval = 0.001 / (n + 2)
-        total = 5000
-        text = "#{}, est. {:<04.2}s".format(n, interval * total)
-        for _ in trange(total, desc=text):
-            sleep(interval)
-        if n == 6:
-            tqdm.write("n == 6 completed.")
-            tqdm.write("`tqdm.write()` is thread-safe in py3!")
-
-    if __name__ == '__main__':
-        with ThreadPoolExecutor() as p:
-            p.map(progresser, L)
+        print("\n" * (len(L) - 2))
 
 Hooks and callbacks
 ~~~~~~~~~~~~~~~~~~~
@@ -547,7 +486,7 @@ Hooks and callbacks
 ``tqdm`` can easily support callbacks/hooks and manual updates.
 Here's an example with ``urllib``:
 
-**``urllib.urlretrieve`` documentation**
+**urllib.urlretrieve documentation**
 
     | [...]
     | If present, the hook function will be called once
@@ -590,41 +529,6 @@ It is recommend to use ``miniters=1`` whenever there is potentially
 large differences in iteration speed (e.g. downloading a file over
 a patchy connection).
 
-**Wrapping read/write methods**
-
-To measure throughput through a file-like object's ``read`` or ``write``
-methods, use ``CallbackIOWrapper``:
-
-.. code:: python
-
-    from tqdm import tqdm
-    from tqdm.utils import CallbackIOWrapper
-
-    with tqdm(total=file_obj.size,
-              unit='B', unit_scale=True, unit_divisor=1024) as t:
-        fobj = CallbackIOWrapper(t.update, file_obj, "read")
-        while True:
-            chunk = fobj.read(chunk_size)
-            if not chunk:
-                break
-        t.reset()
-        # ... continue to use `t` for something else
-
-Alternatively, use the even simpler ``wrapattr`` convenience function,
-which would condense both the ``urllib`` and ``CallbackIOWrapper`` examples
-down to:
-
-.. code:: python
-
-    import urllib, os
-    from tqdm import tqdm
-
-    eg_link = "https://caspersci.uk.to/matryoshka.zip"
-    with tqdm.wrapattr(open(os.devnull, "wb"), "write",
-                       miniters=1, desc=eg_link.split('/')[-1]) as fout:
-        for chunk in urllib.urlopen(eg_link):
-            fout.write(chunk)
-
 Pandas Integration
 ~~~~~~~~~~~~~~~~~~
 
@@ -640,7 +544,7 @@ for ``DataFrame.progress_apply`` and ``DataFrameGroupBy.progress_apply``:
     df = pd.DataFrame(np.random.randint(0, 100, (100000, 6)))
 
     # Register `pandas.progress_apply` and `pandas.Series.map_apply` with `tqdm`
-    # (can use `tqdm.gui.tqdm`, `tqdm.notebook.tqdm`, optional kwargs, etc.)
+    # (can use `tqdm_gui`, `tqdm_notebook`, optional kwargs, etc.)
     tqdm.pandas(desc="my bar!")
 
     # Now you can use `progress_apply` instead of `apply`
@@ -654,31 +558,18 @@ own callbacks), see the
 `examples <https://github.com/tqdm/tqdm/tree/master/examples>`__
 folder or import the module and run ``help()``.
 
-Keras Integration
-~~~~~~~~~~~~~~~~~
-
-A ``keras`` callback is also available:
-
-.. code:: python
-
-    from tqdm.keras import TqdmCallback
-
-    ...
-
-    model.fit(..., verbose=0, callbacks=[TqdmCallback()])
-
 IPython/Jupyter Integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-IPython/Jupyter is supported via the ``tqdm.notebook`` submodule:
+IPython/Jupyter is supported via the ``tqdm_notebook`` submodule:
 
 .. code:: python
 
-    from tqdm.notebook import trange, tqdm
+    from tqdm import tnrange, tqdm_notebook
     from time import sleep
 
-    for i in trange(3, desc='1st loop'):
-        for j in tqdm(range(100), desc='2nd loop'):
+    for i in tnrange(3, desc='1st loop'):
+        for j in tqdm_notebook(range(100), desc='2nd loop'):
             sleep(0.01)
 
 In addition to ``tqdm`` features, the submodule provides a native Jupyter
@@ -689,9 +580,6 @@ light blue: no ETA); as demonstrated below.
 |Screenshot-Jupyter1|
 |Screenshot-Jupyter2|
 |Screenshot-Jupyter3|
-
-The ``notebook`` version supports percentage or pixels for overall width
-(e.g.: ``ncols='100%'`` or ``ncols='480px'``).
 
 It is also possible to let ``tqdm`` automatically choose between
 console or notebook versions by using the ``autonotebook`` submodule:
@@ -709,16 +597,6 @@ this warning.
 Custom Integration
 ~~~~~~~~~~~~~~~~~~
 
-To change the default arguments (such as making ``dynamic_ncols=True``),
-simply use built-in Python magic:
-
-.. code:: python
-
-    from functools import partial
-    from tqdm import tqdm as std_tqdm
-    tqdm = partial(std_tqdm, dynamic_ncols=True)
-
-For further customisation,
 ``tqdm`` may be inherited from to create custom callbacks (as with the
 ``TqdmUpTo`` example `above <#hooks-and-callbacks>`__) or for custom frontends
 (e.g. GUIs such as notebook or plotting packages). In the latter case:
@@ -729,11 +607,6 @@ For further customisation,
 
 Consider overloading ``display()`` to use e.g.
 ``self.frontend(**self.format_dict)`` instead of ``self.sp(repr(self))``.
-
-`tqdm/notebook.py <https://github.com/tqdm/tqdm/blob/master/tqdm/notebook.py>`__
-and `tqdm/gui.py <https://github.com/tqdm/tqdm/blob/master/tqdm/gui.py>`__
-submodules are examples of inheritance which don't (yet) strictly conform to the
-above recommendation.
 
 Dynamic Monitor/Meter
 ~~~~~~~~~~~~~~~~~~~~~
@@ -836,8 +709,20 @@ A reusable canonical example is given below:
     import contextlib
     import sys
     from tqdm import tqdm
-    from tqdm.contrib import DummyTqdmFile
 
+    class DummyTqdmFile(object):
+        """Dummy file-like that will write to tqdm"""
+        file = None
+        def __init__(self, file):
+            self.file = file
+
+        def write(self, x):
+            # Avoid print() second call (useless \n)
+            if len(x.rstrip()) > 0:
+                tqdm.write(x, file=self.file)
+
+        def flush(self):
+            return getattr(self.file, "flush", lambda: None)()
 
     @contextlib.contextmanager
     def std_out_err_redirect_tqdm():
@@ -873,7 +758,7 @@ Monitoring thread, intervals and miniters
 
 - Avoid unnecessary frequent bar refreshing: ``mininterval`` defines how long
   to wait between each refresh. ``tqdm`` always gets updated in the background,
-  but it will display only every ``mininterval``.
+  but it will diplay only every ``mininterval``.
 - Reduce number of calls to check system clock/time.
 - ``mininterval`` is more intuitive to configure than ``miniters``.
   A clever adjustment system ``dynamic_miniters`` will automatically adjust
@@ -896,13 +781,13 @@ updates at least every 10 seconds by default.
 This value can be directly changed by setting the ``monitor_interval`` of
 any ``tqdm`` instance (i.e. ``t = tqdm.tqdm(...); t.monitor_interval = 2``).
 The monitor thread may be disabled application-wide by setting
-``tqdm.tqdm.monitor_interval = 0`` before instantiation of any ``tqdm`` bar.
+``tqdm.tqdm.monitor_interval = 0`` before instantiatiation of any ``tqdm`` bar.
 
 
 Contributions
 -------------
 
-|GitHub-Commits| |GitHub-Issues| |GitHub-PRs| |OpenHub-Status| |GitHub-Contributions| |CII Best Practices|
+|GitHub-Commits| |GitHub-Issues| |GitHub-PRs| |OpenHub-Status| |GitHub-Contributions|
 
 All source code is hosted on `GitHub <https://github.com/tqdm/tqdm>`__.
 Contributions are welcome.
@@ -913,23 +798,21 @@ file for more information.
 
 Developers who have made significant contributions, ranked by *LoC*
 (surviving lines of code,
-`git fame <https://github.com/casperdcl/git-fame>`__ ``-wMC``),
+`git fame -wMC --excl '\.(png|gif|enc)$' <https://github.com/casperdcl/git-fame>`__),
 are:
 
 ==================== ================================================== ==== ================================
 Name                 ID                                                 LoC  Notes
 ==================== ================================================== ==== ================================
 Casper da Costa-Luis `casperdcl <https://github.com/casperdcl>`__       ~3/4 primary maintainer |Gift-Casper|
-Stephen Larroque     `lrq3000 <https://github.com/lrq3000>`__           ~10% team member
-Kyle Altendorf       `altendky <https://github.com/altendky>`__         ~2%
-Guangshuo Chen       `chengs <https://github.com/chengs>`__             ~1%
-Matthew Stevens      `mjstevens777 <https://github.com/mjstevens777>`__ ~1%
+Stephen Larroque     `lrq3000 <https://github.com/lrq3000>`__           ~1/6 team member
 Noam Yorav-Raphael   `noamraph <https://github.com/noamraph>`__         ~1%  original author
+Matthew Stevens      `mjstevens777 <https://github.com/mjstevens777>`__ ~1%
+Guangshuo Chen       `chengs <https://github.com/chengs>`__             ~1%
 Hadrien Mary         `hadim <https://github.com/hadim>`__               ~1%  team member
 Mikhail Korobov      `kmike <https://github.com/kmike>`__               ~1%  team member
+Kyle Altendorf       `altendky <https://github.com/altendky>`__         ~1%
 ==================== ================================================== ==== ================================
-
-|sourcerer-0| |sourcerer-1| |sourcerer-2| |sourcerer-3| |sourcerer-4| |sourcerer-5| |sourcerer-7|
 
 Ports to Other Languages
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -943,16 +826,12 @@ LICENCE
 
 Open Source (OSI approved): |LICENCE|
 
-Citation information: |DOI| (publication), |DOI-code| (code)
+Citation information: |DOI-URI|
 
 |README-Hits| (Since 19 May 2016)
 
 .. |Logo| image:: https://raw.githubusercontent.com/tqdm/tqdm/master/images/logo.gif
 .. |Screenshot| image:: https://raw.githubusercontent.com/tqdm/tqdm/master/images/tqdm.gif
-.. |Video| image:: https://raw.githubusercontent.com/tqdm/tqdm/master/images/video.jpg
-   :target: https://tqdm.github.io/video
-.. |Slides| image:: https://raw.githubusercontent.com/tqdm/tqdm/master/images/slides.jpg
-   :target: https://tqdm.github.io/PyData2019/slides.html
 .. |Build-Status| image:: https://img.shields.io/travis/tqdm/tqdm/master.svg?logo=travis
    :target: https://travis-ci.org/tqdm/tqdm
 .. |Coverage-Status| image:: https://coveralls.io/repos/tqdm/tqdm/badge.svg?branch=master
@@ -961,8 +840,6 @@ Citation information: |DOI| (publication), |DOI-code| (code)
    :target: https://codecov.io/gh/tqdm/tqdm
 .. |Codacy-Grade| image:: https://api.codacy.com/project/badge/Grade/3f965571598f44549c7818f29cdcf177
    :target: https://www.codacy.com/app/tqdm/tqdm/dashboard
-.. |CII Best Practices| image:: https://bestpractices.coreinfrastructure.org/projects/3264/badge
-   :target: https://bestpractices.coreinfrastructure.org/projects/3264
 .. |GitHub-Status| image:: https://img.shields.io/github/tag/tqdm/tqdm.svg?maxAge=86400&logo=github&logoColor=white
    :target: https://github.com/tqdm/tqdm/releases
 .. |GitHub-Forks| image:: https://img.shields.io/github/forks/tqdm/tqdm.svg?logo=github&logoColor=white
@@ -981,17 +858,17 @@ Citation information: |DOI| (publication), |DOI-code| (code)
    :target: https://github.com/tqdm/tqdm/pulse
 .. |Gift-Casper| image:: https://img.shields.io/badge/dynamic/json.svg?color=ff69b4&label=gifts%20received&prefix=%C2%A3&query=%24..sum&url=https%3A%2F%2Fcaspersci.uk.to%2Fgifts.json
    :target: https://caspersci.uk.to/donate
-.. |Versions| image:: https://img.shields.io/pypi/v/tqdm.svg
-   :target: https://tqdm.github.io/releases
-.. |PyPI-Downloads| image:: https://img.shields.io/pypi/dm/tqdm.svg?label=pypi%20downloads&logo=PyPI&logoColor=white
+.. |PyPI-Status| image:: https://img.shields.io/pypi/v/tqdm.svg
    :target: https://pypi.org/project/tqdm
-.. |Py-Versions| image:: https://img.shields.io/pypi/pyversions/tqdm.svg?logo=python&logoColor=white
+.. |PyPI-Downloads| image:: https://img.shields.io/pypi/dm/tqdm.svg?label=pypi%20downloads&logo=python&logoColor=white
+   :target: https://pypi.org/project/tqdm
+.. |PyPI-Versions| image:: https://img.shields.io/pypi/pyversions/tqdm.svg?logo=python&logoColor=white
    :target: https://pypi.org/project/tqdm
 .. |Conda-Forge-Status| image:: https://img.shields.io/conda/v/conda-forge/tqdm.svg?label=conda-forge&logo=conda-forge
    :target: https://anaconda.org/conda-forge/tqdm
 .. |Snapcraft| image:: https://img.shields.io/badge/snap-install-82BEA0.svg?logo=snapcraft
    :target: https://snapcraft.io/tqdm
-.. |Docker| image:: https://img.shields.io/badge/docker-pull-blue.svg?logo=docker&logoColor=white
+.. |Docker| image:: https://img.shields.io/badge/docker-pull-blue.svg?logo=docker
    :target: https://hub.docker.com/r/tqdm/tqdm
 .. |Libraries-Rank| image:: https://img.shields.io/librariesio/sourcerank/pypi/tqdm.svg?logo=koding&logoColor=white
    :target: https://libraries.io/pypi/tqdm
@@ -999,13 +876,9 @@ Citation information: |DOI| (publication), |DOI-code| (code)
     :target: https://github.com/tqdm/tqdm/network/dependents
 .. |OpenHub-Status| image:: https://www.openhub.net/p/tqdm/widgets/project_thin_badge?format=gif
    :target: https://www.openhub.net/p/tqdm?ref=Thin+badge
-.. |awesome-python| image:: https://awesome.re/mentioned-badge.svg
-   :target: https://github.com/vinta/awesome-python
 .. |LICENCE| image:: https://img.shields.io/pypi/l/tqdm.svg
    :target: https://raw.githubusercontent.com/tqdm/tqdm/master/LICENCE
-.. |DOI| image:: https://img.shields.io/badge/DOI-10.21105/joss.01277-green.svg
-   :target: https://doi.org/10.21105/joss.01277
-.. |DOI-code| image:: https://img.shields.io/badge/DOI-10.5281/zenodo.595120-blue.svg
+.. |DOI-URI| image:: https://img.shields.io/badge/DOI-10.5281/zenodo.595120-blue.svg
    :target: https://doi.org/10.5281/zenodo.595120
 .. |notebook-demo| image:: https://img.shields.io/badge/launch-notebook-orange.svg?logo=jupyter
    :target: https://notebooks.ai/demo/gh/tqdm/tqdm
@@ -1016,19 +889,3 @@ Citation information: |DOI| (publication), |DOI-code| (code)
 .. |Screenshot-Jupyter3| image:: https://raw.githubusercontent.com/tqdm/tqdm/master/images/tqdm-jupyter-3.gif
 .. |README-Hits| image:: https://caspersci.uk.to/cgi-bin/hits.cgi?q=tqdm&style=social&r=https://github.com/tqdm/tqdm&l=https://caspersci.uk.to/images/tqdm.png&f=https://raw.githubusercontent.com/tqdm/tqdm/master/images/logo.gif
    :target: https://caspersci.uk.to/cgi-bin/hits.cgi?q=tqdm&a=plot&r=https://github.com/tqdm/tqdm&l=https://caspersci.uk.to/images/tqdm.png&f=https://raw.githubusercontent.com/tqdm/tqdm/master/images/logo.gif&style=social
-.. |sourcerer-0| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/0
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/0
-.. |sourcerer-1| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/1
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/1
-.. |sourcerer-2| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/2
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/2
-.. |sourcerer-3| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/3
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/3
-.. |sourcerer-4| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/4
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/4
-.. |sourcerer-5| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/5
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/5
-.. |sourcerer-6| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/6
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/6
-.. |sourcerer-7| image:: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/images/7
-   :target: https://sourcerer.io/fame/casperdcl/tqdm/tqdm/links/7

@@ -3,11 +3,10 @@ import subprocess
 from os import path
 from shutil import rmtree
 from tempfile import mkdtemp
-from tqdm.cli import main, TqdmKeyError, TqdmTypeError
-from tqdm.utils import IS_WIN
+from tqdm import main, TqdmKeyError, TqdmTypeError
 
 from tests_tqdm import with_setup, pretest, posttest, _range, closing, \
-    UnicodeIO, StringIO, SkipTest
+    UnicodeIO, StringIO
 
 
 def _sh(*cmd, **kwargs):
@@ -34,7 +33,7 @@ def test_main():
     ls_out = _sh('ls').replace('\r\n', '\n')
     ls = subprocess.Popen('ls', stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
-    res = _sh(sys.executable, '-c', 'from tqdm.cli import main; main()',
+    res = _sh(sys.executable, '-c', 'from tqdm import main; main()',
               stdin=ls.stdout, stderr=subprocess.STDOUT)
     ls.wait()
 
@@ -49,7 +48,7 @@ def test_main():
         sys.argv = ['', '--desc', 'Test CLI --delim',
                     '--ascii', 'True', '--delim', r'\0', '--buf_size', '64']
         sys.stdin.write('\0'.join(map(str, _range(int(123)))))
-        # sys.stdin.write(b'\xff')  # TODO
+        #sys.stdin.write(b'\xff')  # TODO
         sys.stdin.seek(0)
         main()
     sys.stdin = IN_DATA_LIST
@@ -62,7 +61,7 @@ def test_main():
         IN_DATA = '\0'.join(IN_DATA_LIST)
         sys.stdin.write(IN_DATA)
         sys.stdin.seek(0)
-        sys.argv = ['', '--ascii', '--bytes=True', '--unit_scale', 'False']
+        sys.argv = ['', '--ascii', '--bytes', '--unit_scale', 'False']
         with closing(UnicodeIO()) as fp:
             main(fp=fp)
             assert str(len(IN_DATA)) in fp.getvalue()
@@ -83,8 +82,6 @@ def test_main():
 
 def test_manpath():
     """Test CLI --manpath"""
-    if IS_WIN:
-        raise SkipTest
     tmp = mkdtemp()
     man = path.join(tmp, "tqdm.1")
     assert not path.exists(man)

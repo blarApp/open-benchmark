@@ -48,10 +48,9 @@ def my_hook(t):
         bsize  : int, optional
             Size of each block (in tqdm units) [default: 1].
         tsize  : int, optional
-            Total size (in tqdm units). If [default: None] or -1,
-            remains unchanged.
+            Total size (in tqdm units). If [default: None] remains unchanged.
         """
-        if tsize not in (None, -1):
+        if tsize is not None:
             t.total = tsize
         t.update((b - last_b[0]) * bsize)
         last_b[0] = b
@@ -95,9 +94,3 @@ with TqdmUpTo(unit='B', unit_scale=True, unit_divisor=1024, miniters=1,
               desc=eg_file) as t:  # all optional kwargs
     urllib.urlretrieve(eg_link, filename=eg_out, reporthook=t.update_to,
                        data=None)
-
-# Even simpler progress by wrapping the output file's `write()`
-with tqdm.wrapattr(open(eg_out, "wb"), "write",
-                   miniters=1, desc=eg_file) as fout:
-    for chunk in urllib.urlopen(eg_link):
-        fout.write(chunk)
