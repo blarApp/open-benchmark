@@ -853,7 +853,7 @@ class tqdm(object):
         return self.total if self.iterable is None else \
             (self.iterable.shape[0] if hasattr(self.iterable, "shape")
              else len(self.iterable) if hasattr(self.iterable, "__len__")
-             else getattr(self, "total", None))
+             else self.total)
 
     def __enter__(self):
         return self
