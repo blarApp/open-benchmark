@@ -320,8 +320,7 @@ class tqdm(Comparable):
 
         # apply custom scale if necessary
         if unit_scale and unit_scale not in (True, 1):
-            if total:
-                total *= unit_scale
+            total *= unit_scale
             n *= unit_scale
             if rate:
                 rate *= unit_scale  # by default rate = 1 / self.avg_time
