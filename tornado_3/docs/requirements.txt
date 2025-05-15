@@ -1,4 +1,0 @@
-# https://bugs.python.org/issue34700
-sphinx<1.8.0
-sphinx_rtd_theme
-Twisted

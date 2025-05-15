@@ -61,20 +61,6 @@ Each test case below corresponds to a buggy-to-fixed repository pair.
   - Related issues:
      - Not available
 
-### Tornado Issues
-- tornado_1
-  - Related issues:
-     - https://github.com/tornadoweb/tornado/issues/2611
-- tornado_2
-  - Related issues:
-     - Not available
-- tornado_3
-  - Related issues:
-     - https://github.com/tornadoweb/tornado/issues/2539
-- tornado_4
-  - Related issues:
-     - https://github.com/tornadoweb/tornado/issues/2521
-
 ### Thefuck Issues
 - thefuck_1
   - Related issues:
