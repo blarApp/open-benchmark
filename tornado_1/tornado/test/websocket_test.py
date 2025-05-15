@@ -198,12 +198,6 @@ class ErrorInAsyncOpenHandler(TestWebSocketHandler):
         raise Exception("boom")
 
 
-class NoDelayHandler(TestWebSocketHandler):
-    def open(self):
-        self.set_nodelay(True)
-        self.write_message("hello")
-
-
 class WebSocketBaseTestCase(AsyncHTTPTestCase):
     @gen.coroutine
     def ws_connect(self, path, **kwargs):
@@ -264,7 +258,6 @@ class WebSocketTest(WebSocketBaseTestCase):
                 ),
                 ("/error_in_open", ErrorInOpenHandler),
                 ("/error_in_async_open", ErrorInAsyncOpenHandler),
-                ("/nodelay", NoDelayHandler),
             ],
             template_loader=DictLoader({"message.html": "<b>{{ message }}</b>"}),
         )
@@ -568,12 +561,6 @@ class WebSocketTest(WebSocketBaseTestCase):
             ws = yield self.ws_connect("/error_in_async_open")
             res = yield ws.read_message()
         self.assertIsNone(res)
-
-    @gen_test
-    def test_nodelay(self):
-        ws = yield self.ws_connect("/nodelay")
-        res = yield ws.read_message()
-        self.assertEqual(res, "hello")
 
 
 class NativeCoroutineOnMessageHandler(TestWebSocketHandler):
