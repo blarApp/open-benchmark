@@ -71,3 +71,6 @@ Each test case below corresponds to a buggy-to-fixed repository pair.
 - thefuck_3
   - Related issues:
      - https://github.com/nvbn/thefuck/issues/869
+- thefuck_4
+  - Related issues:
+     - https://github.com/nvbn/thefuck/issues/807
