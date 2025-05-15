@@ -40,28 +40,37 @@ The current benchmark uses real-world issues extracted from the [`maniple`](http
 Each test case below corresponds to a buggy-to-fixed repository pair.
 
 ### Tqdm Issues
-- **tqdm_1**
+- tqdm_1
   - Related issues:
      - https://github.com/tqdm/tqdm/issues/402
      - https://github.com/tqdm/tqdm/issues/840
      - https://github.com/tqdm/tqdm/issues/480
-- **tqdm_3**
+- tqdm_3
   - Related issues:
      - https://github.com/tqdm/tqdm/issues/353
-- **tqdm_4**
+- tqdm_4
   - Related issues:
      - Not available
-- **tqdm_5**
-    - Related issues:
-         - https://github.com/tqdm/tqdm/issues/574
-- **tqdm_6**
-    - Related issues:
-         - https://github.com/tqdm/tqdm/issues/539
-- **tqdm_8**
-    - Related issues:
-         - Not available
+- tqdm_5
+  - Related issues:
+     - https://github.com/tqdm/tqdm/issues/574
+- tqdm_6
+  - Related issues:
+     - https://github.com/tqdm/tqdm/issues/539
+- tqdm_8
+  - Related issues:
+     - Not available
 
 ### Tornado Issues
-- **tornado_1**
+- tornado_1
   - Related issues:
      - https://github.com/tornadoweb/tornado/issues/2611
+- tornado_2
+  - Related issues:
+     - Not available
+- tornado_3
+  - Related issues:
+     - https://github.com/tornadoweb/tornado/issues/2539
+- tornado_4
+  - Related issues:
+     - https://github.com/tornadoweb/tornado/issues/2521
