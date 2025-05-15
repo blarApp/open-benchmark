@@ -74,3 +74,8 @@ Each test case below corresponds to a buggy-to-fixed repository pair.
 - tornado_4
   - Related issues:
      - https://github.com/tornadoweb/tornado/issues/2521
+
+### Thefuck Issues
+- thefuck_1
+  - Related issues:
+     - https://github.com/nvbn/thefuck/issues/1047
