@@ -39,6 +39,7 @@ The current benchmark uses real-world issues extracted from the [`maniple`](http
 
 Each test case below corresponds to a buggy-to-fixed repository pair.
 
+### Tqdm Issues
 - **tqdm_1**
   - Related issues:
      - https://github.com/tqdm/tqdm/issues/402
@@ -59,3 +60,8 @@ Each test case below corresponds to a buggy-to-fixed repository pair.
 - **tqdm_8**
     - Related issues:
          - Not available
+
+### Tornado Issues
+- **tornado_1**
+  - Related issues:
+     - https://github.com/tornadoweb/tornado/issues/2611
