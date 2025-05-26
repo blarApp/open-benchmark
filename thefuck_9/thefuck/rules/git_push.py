@@ -24,11 +24,7 @@ def get_new_command(command):
         pass
     if upstream_option_index is not -1:
         command.script_parts.pop(upstream_option_index)
-        try:
-            command.script_parts.pop(upstream_option_index)
-        except IndexError:
-            # This happens for `git push -u`
-            pass
+        command.script_parts.pop(upstream_option_index)
 
     push_upstream = command.stderr.split('\n')[-3].strip().partition('git ')[2]
     return replace_argument(" ".join(command.script_parts), 'push', push_upstream)
